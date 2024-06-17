@@ -564,7 +564,7 @@ impl<T: AsyncRead + AsyncWrite + Unpin, A: Authentication> Socks5Socket<T, A> {
     ///
     /// It the request is correct, it should returns a ['SocketAddr'].
     ///
-    async fn read_command(&mut self) -> Result<()> {
+    pub async fn read_command(&mut self) -> Result<()> {
         let [version, cmd, rsv, address_type] =
             read_exact!(self.inner, [0u8; 4]).context("Malformed request")?;
         debug!(
