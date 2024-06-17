@@ -350,7 +350,7 @@ impl<T: AsyncRead + AsyncWrite + Unpin, A: Authentication> Socks5Socket<T, A> {
     ///     eg. (auth)     {5, 3}
     /// ```
     ///
-    async fn get_methods(&mut self) -> Result<Vec<u8>> {
+    pub async fn get_methods(&mut self) -> Result<Vec<u8>> {
         trace!("Socks5Socket: get_methods()");
         // read the first 2 bytes which contains the SOCKS version and the methods len()
         let [version, methods_len] =
@@ -395,7 +395,7 @@ impl<T: AsyncRead + AsyncWrite + Unpin, A: Authentication> Socks5Socket<T, A> {
     ///     eg. (non-acceptable)  {5, 0xff}
     /// ```
     ///
-    async fn can_accept_method(&mut self, client_methods: Vec<u8>) -> Result<u8> {
+    pub async fn can_accept_method(&mut self, client_methods: Vec<u8>) -> Result<u8> {
         let method_supported;
 
         if let Some(_auth) = self.config.auth.as_ref() {
@@ -437,7 +437,7 @@ impl<T: AsyncRead + AsyncWrite + Unpin, A: Authentication> Socks5Socket<T, A> {
         Ok(method_supported)
     }
 
-    async fn read_username_password(socket: &mut T) -> Result<(String, String)> {
+    pub async fn read_username_password(socket: &mut T) -> Result<(String, String)> {
         trace!("Socks5Socket: authenticate()");
         let [version, user_len] = read_exact!(socket, [0u8; 2]).context("Can't read user len")?;
         debug!(
@@ -481,7 +481,7 @@ impl<T: AsyncRead + AsyncWrite + Unpin, A: Authentication> Socks5Socket<T, A> {
     ///  - this server has `Authentication` trait implemented.
     ///  - and the client supports authentication via username/password
     ///  - or the client doesn't send authentication, but we let the trait decides if the `allow_no_auth()` set as `true`
-    async fn authenticate(&mut self, auth_method: u8) -> Result<A::Item> {
+    pub async fn authenticate(&mut self, auth_method: u8) -> Result<A::Item> {
         let credentials = if auth_method == consts::SOCKS5_AUTH_METHOD_PASSWORD {
             let credentials = Self::read_username_password(&mut self.inner).await?;
             Some(credentials)
